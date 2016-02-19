@@ -1,0 +1,43 @@
+# Site Info
+title:              "The Plain"
+description:        "The Plain is a Minimalist Jekyll theme that focuses on writing matters."
+google_verification:      MAm4iA2OdGJA9Z81OO90z8R6MsbtluGIhOaxXTlBUn4 # Put your Google Verification here
+google_analytics:   UA-74080208-1 # Put your Google Analytics code
+
+# Author Info
+author_name:        "hassansin"
+author_email:       rezatxe@gmail.com
+author_gravatar:    # Gravatar md5 hash
+twitter:
+    username:   hassansine
+
+# Site Settings
+baseurl:            "" # Base URL must end WITHOUT a slash, default: ""
+permalink:          /:title # Post permalink
+timezone:           Asia/Dhaka # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+# Site Build
+# highlighter:        pygments
+markdown:           redcarpet
+redcarpet:
+    extensions:     ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data", "highlight", "footnotes"]
+#markdown:           kramdown
+#kramdown:
+#    input:          GFM
+sass:
+    style:          :compressed
+
+# Other Params
+include:            [ "robots.txt" ]
+exclude:            [ "LICENSE", "README.md", "CNAME", "vendor", "Gemfile"]
+gems:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jemoji
+  - jekyll-feed
+
+compress_html:
+    clippings:      all
+    ingore:
+        envs:       [ "test" ]
+
