@@ -127,8 +127,8 @@ span[data-note] {
   -webkit-animation-fill-mode: both;
   -webkit-animation-name: bounce;
   a {
-    background: #ddd;
-    color: #000;
+    background: #CE1F43;
+    color: #fff;
     text-decoration: none;
     font-weight: 700;
     height: 100px;
@@ -142,7 +142,7 @@ span[data-note] {
     box-sizing: border-box;
     &:hover,
     &:focus {
-      background: #f14e32;
+      background: #E8395D;
     }
     .gravatar {
       margin-top: 5px;
@@ -332,6 +332,7 @@ section {
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
         word-wrap: normal !important;
+        font-family: 'Roboto Slab', sans-serif;
       }
       a {
         text-decoration: none;

@@ -98,7 +98,7 @@ Here is the breakdown of the above code:
 
 1. First, we are saving the fingerprint in the constant `FINGERPRINTSET`. It is a good idea to save all the fingerprints if you have multiple certificates.
 
-2. Next we are listening to the `socket` event. This is emitted as soon as a socket is assigned to the request. But the certificate is not yet available. We will get certificate information after a successful handshake is made and `secureConnect` event is emitted. It is important to mention that, a socket is also available in `res` object in our request callback. *But it also means we already have connected to the server and transferred any secret data during the `POST` request*. So aborting request at this stage won't prevent the attacker reading your data.
+2. Next we are listening to the `socket` event. This is emitted as soon as a socket is assigned to the request. But the certificate is not yet available. We will get certificate information after a successful handshake is made and `secureConnect` event is emitted. It is important to mention that, a socket is also available in `res` object in our request callback. **But it also means we already have connected to the server and transferred any secret data during the `POST` request**. So aborting request at this stage won't prevent the attacker reading your data.
 
 3. Next we are checking if the certificate is invalid by `socket.authorized === false` and aborting the request.
 
