@@ -18,12 +18,14 @@ timezone:           Asia/Dhaka # https://en.wikipedia.org/wiki/List_of_tz_databa
 
 # Site Build
 # highlighter:        pygments
-markdown:           redcarpet
-redcarpet:
-    extensions:     ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data", "highlight", "footnotes"]
-#markdown:           kramdown
-#kramdown:
-#    input:          GFM
+# markdown:           redcarpet
+# redcarpet:
+    # extensions:     ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data", "highlight", "footnotes"]
+markdown:           kramdown
+kramdown:
+    input:          GFM
+    auto_ids:       true
+    toc_levels:     1..6
 sass:
     style:          :compressed
 

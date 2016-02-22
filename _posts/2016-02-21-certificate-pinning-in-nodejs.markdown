@@ -10,7 +10,6 @@ Certificate Pinning adds an extra layer of security to your application. Special
 
 You can learn more about Certificate pinning in the [OWASP guide](https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning)
 
-
 ## How does it work in theory?
 
 To pin the certificate, first get the original certificate for your host and hard-code it in your application. Then when making a request to the host, retrieve the server's certificate and match it with the certificate embedded in the code. If doesn't match, abort the connection. Make sure you do this before you start to read/write to the server. Otherwise, all this would be futile as the attacker would have already got hold of your precious data.
@@ -23,29 +22,36 @@ Before we start, we need to get the server certificate fingerprint. If you alrea
 
 I'll use *https://api.github.com* throughout the example.
 
-1. **Fetch public certificate:** You'll need a secure connection for this. Somewhere you are sure that no one is eavesdropping on the network.
+**1. Fetch public certificate:**
 
-    ```sh
-    echo -n | openssl s_client -connect api.github.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > cert.pem
-    ```
-    This would generate a `cert.pem` containing public certificate of api.github.com
+You'll need a secure connection for this. Somewhere you are sure that no one is eavesdropping on the network.
 
-2. **Generate certificate fingerprint:** Use the certificate to generate fingerprint:
+{%highlight shell%}
+echo -n | openssl s_client -connect api.github.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > cert.pem
+{% endhighlight %}
 
-    ```sh
-    openssl x509 -noout -in cert.pem -fingerprint
-    ```
-    You will get an output like:
+This would generate a `cert.pem` containing public certificate of api.github.com
 
-    ```
-    SHA1 Fingerprint=CF:05:98:89:CA:FF:8E:D8:5E:5C:E0:C2:E4:F7:E6:C3:C7:50:DD:5C
-    ```
+**2. Generate certificate fingerprint:**
+
+Use the certificate to generate fingerprint:
+
+{%highlight shell%}
+openssl x509 -noout -in cert.pem -fingerprint
+{% endhighlight %}
+
+You will get an output like:
+
+{%highlight shell%}
+SHA1 Fingerprint=CF:05:98:89:CA:FF:8E:D8:5E:5C:E0:C2:E4:F7:E6:C3:C7:50:DD:5C
+{% endhighlight %}
+
 
 ## Certificate pinning with `https` module
 
 Let's do the certificate pinning using Node.js `https` module. It is very important to keep in mind that we need to do this even before sending any data to the host.
 
-```javascript
+{% highlight javascript %}
 const https = require('https');
 // Embed valid fingerprints in the code
 const FINGERPRINTSET = [
@@ -92,7 +98,7 @@ req.on('socket', socket => {
 
 req.end();
 
-```
+{% endhighlight %}
 
 Here is the breakdown of the above code:
 
@@ -114,65 +120,65 @@ It's because when a tls session is reused, all certificate information is stripp
 
 So, there are two ways to workaround this problem. Unfortunately, none of them are documented in the node.js official documentation.
 
-1. **Skip fingerprint validation if session is reused:**
+**1. Skip fingerprint validation if session is reused:**
 
-    We can use `socket.isSessionReused()` method to see if the session is reused. This method is not documented and used internally in the node.js source.
+We can use `socket.isSessionReused()` method to see if the session is reused. This method is not documented and used internally in the node.js source.
 
-    ```javascript
-    //...
+{% highlight javascript %}
+//...
 
-    req.on('socket', socket => {
-      socket.on('secureConnect', () => {
-        var fingerprint = socket.getPeerCertificate().fingerprint;
+req.on('socket', socket => {
+  socket.on('secureConnect', () => {
+    var fingerprint = socket.getPeerCertificate().fingerprint;
 
-        // Check if certificate is valid
-        if(socket.authorized === false){
-          req.emit('error', new Error(socket.authorizationError));
-          return req.abort();
-        }
+    // Check if certificate is valid
+    if(socket.authorized === false){
+      req.emit('error', new Error(socket.authorizationError));
+      return req.abort();
+    }
 
-        // Match the fingerprint with our saved fingerprints only for a new tls session
-        if(FINGERPRINTSET.indexOf(fingerprint) === -1 && !socket.isSessionReused()){
-          // Abort request, optionally emit an error event
-          req.emit('error', new Error('Fingerprint does not match'));
-          return req.abort();
-        }
-      });
-    });
-    ```
+    // Match the fingerprint with our saved fingerprints only for a new tls session
+    if(FINGERPRINTSET.indexOf(fingerprint) === -1 && !socket.isSessionReused()){
+      // Abort request, optionally emit an error event
+      req.emit('error', new Error('Fingerprint does not match'));
+      return req.abort();
+    }
+  });
+});
+{% endhighlight %}
 
-2. **Disable session reuse:**
+**2. Disable session reuse:**
 
-    This is more secure than the previous method. Here we'll disable session by using a HTTPS Agent. The Agent constructor takes a `maxCachedSessions` property. We'll set it to `0` to prevent caching.
+This is more secure than the previous method. Here we'll disable session by using a HTTPS Agent. The Agent constructor takes a `maxCachedSessions` property. We'll set it to `0` to prevent caching.
 
-    ```javascript
-    //...
+{% highlight javascript %}
+//...
 
-      var options = {
-        hostname: 'api.github.com',
-        port: 443,
-        path: '/',
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Node.js/https'
-        },
-        //disable session caching
-        agent: new https.Agent({
-          maxCachedSessions: 0
-        })
-      };
+  var options = {
+    hostname: 'api.github.com',
+    port: 443,
+    path: '/',
+    method: 'GET',
+    headers: {
+      'User-Agent': 'Node.js/https'
+    },
+    //disable session caching
+    agent: new https.Agent({
+      maxCachedSessions: 0
+    })
+  };
 
-    //...
-    ```
+//...
+{% endhighlight %}
 
-    Here it's important to mention that, disabling session cache means performing certificate handshake on every request. This can lead to increased usage of hardware resources, especially if the application has pretty high traffic.
+Here it's important to mention that, disabling session cache means performing certificate handshake on every request. This can lead to increased usage of hardware resources, especially if the application has pretty high traffic.
 
 
 ## Using [`request`](https://github.com/request/request) module:
 
 With `request` module, the process is almost same. Except, the certificate validation (NOT fingerprint validation) part can be handed over to the module itself using `strictSSL:true` property.
 
-```javascript
+{% highlight javascript  %}
 const Agent = require('https').Agent,
   request = require('request');
 
@@ -213,4 +219,4 @@ req.on('socket', socket => {
     }
   });
 });
-```
+{% endhighlight %}
