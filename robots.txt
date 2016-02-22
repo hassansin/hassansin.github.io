@@ -2,7 +2,7 @@
 layout: null
 ---
 
-sitemap: {{ site.baseurl | replace: 'https', 'http' | append: '/sitemap.xml' }}
+sitemap: https://hassansin.github.io/sitemap.xml
 
 user-agent: EmailCollector
 disallow: /

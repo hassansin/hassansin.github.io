@@ -291,6 +291,11 @@ share-button{
     content:'';
     background:none;
   }
+  a {
+    &:hover{
+      border-bottom:none;
+    }
+  }
 }
 .wrapper{
   min-height: 100%;
