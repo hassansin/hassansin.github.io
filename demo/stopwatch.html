@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <head>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+    <svg id="drawing"></svg>
+    <script type="text/javascript">
+
+      var w = 500, // svg width
+      h = 300, // svg height
+      padding = 40, //svg padding
+
+      //radius settings
+      r1 = Math.min(w,h)/2- padding,
+      r2 = 0.25*r1,
+      r3 = 0.30*r1,
+      r4 = 0.30*r1,
+
+      //marker settings
+      markers = {
+        second: {
+          primary: {
+            width: 1,
+            height: 6,
+            count: 3,
+            color: 'orange',
+          }
+        },
+        minute: {
+          primary: {
+            width: 1,
+            height: 10,
+            color: 'orange',
+          },
+          secondary:{
+            width: 1,
+            height: 4,
+            color: 'orange',
+          }
+        },
+        hour: {
+          primary: {
+            width: 2,
+            height: 15,
+            color: 'orange',
+          },
+          secondary:{
+            width: 1,
+            height: 8,
+            color: 'orange',
+          }
+        }
+      },
+      //marker labels
+      labels = {
+        primary:{
+          color: '#666',
+          font: 14,
+        },
+        secondary: {
+          color: '#666',
+          font: 10,
+        }
+      },
+      //needle settings
+      needles = {
+        primary: {
+          width: 2,
+          length: r1,
+          wheelRadius: 8,
+          wheelStroke: 2,
+          color: '#607D8B',
+        },
+        secondary: {
+          width: 1,
+          length: r2,
+          wheelRadius: 2.5,
+          wheelStroke: 5,
+          color: '#E91E63',
+        },
+        tertiary: {
+          width: 1,
+          length: r3*0.9,
+          wheelRadius: 2.5,
+          wheelStroke: 5,
+          color: '#E91E63',
+        }
+      };
+
+  // linear line function
+  var lineFun = d3.svg.line()
+       .x(function(d){return d[0];})
+       .y(function(d){return d[1];})
+       .interpolate('linear');
+
+  //svg element
+  var svg = d3.select('#drawing')
+      .attr({
+        width: w,
+        height: h,
+      });
+
+  // Scales
+  var scale = d3.scale.linear()
+    .range([0, 360]);
+
+  var miliSecondScale = scale.copy().domain([0,100]),
+      secondMarkerScale = scale.copy()
+        .domain([0, 60*(markers.second.primary.count+1)]),
+      minuteMarkerScale = scale.copy().domain([0,60]),
+      hourMarkerScale = scale.copy().domain([0,12]),
+      labelScale = scale.copy().domain([0,60,5]);
+
+
+
+  //group for start/stop buttons
+  var g4 = svg.append('g')
+    .attr({
+       transform: 'translate('+ (w/2 ) +','+ ( h/2 + r1/2) +')'
+    });
+
+  //Tertiary clock face for milisecond
+  var g3 = svg.append('g')
+    .attr({
+      'class': 'tertiary',
+      transform: 'translate('+ (w/2 + r1/2 + needles.primary.wheelRadius) +','+ h/2 +')'
+    });
+
+  //Secondary clock face for minutes
+  var g2 = svg.append('g')
+    .attr({
+      'class': 'secondary',
+      transform: 'translate('+ w/2 +','+ (h/2 - r1/2 - needles.primary.wheelRadius) +')'
+    });
+
+
+  //Primary clock face for seconds
+  var g1 = svg.append('g')
+    .attr({
+      'class': 'primary',
+      transform: 'translate('+ w/2 +','+ h/2 +')',
+    });
+
+
+  // Draw markers on primary clock face
+
+  g1.selectAll('.hour-marker').data(d3.range(0,12))
+    .enter().append('rect')
+    .attr({
+      x: -markers.hour.primary.width/2,
+      y: - r1 + 2 - markers.hour.primary.height,
+      width: markers.hour.primary.width,
+      height: markers.hour.primary.height,
+      fill: markers.hour.primary.color,
+      transform: function(d){
+        return 'rotate('+ hourMarkerScale(d) +')';
+      },
+      'class': 'hour-marker',
+    });
+
+  g1.selectAll('.min-marker').data(d3.range(0,60))
+    .enter().append('rect')
+    .attr({
+      x: -markers.minute.primary.width/2,
+      y: - r1 - markers.minute.primary.height,
+      width: markers.minute.primary.width,
+      height: markers.minute.primary.height,
+      fill: markers.minute.primary.color,
+      transform: function(d){
+        return 'rotate('+ minuteMarkerScale(d) +')';
+      },
+      'class': 'min-marker',
+    });
+
+  g1.selectAll('.second-marker')
+    .data(d3.range.apply(null,secondMarkerScale.domain()))
+    .enter().append('rect')
+    .attr({
+      x: -markers.second.primary.width/2,
+      y: -r1 - markers.minute.primary.height,
+      width: markers.second.primary.width,
+      height: markers.second.primary.height,
+      fill: markers.second.primary.color,
+      transform: function(d){
+        return 'rotate('+ secondMarkerScale(d)+')';
+      },
+      'class': 'second-marker',
+    });
+
+  g1.selectAll('.minute-label').data(d3.range(5,65,5))
+    .enter()
+    .append('g')
+    .attr({
+      'class': 'minute-label',
+      'transform': function(d){
+        return 'rotate('+ labelScale(d) +')';
+      }
+    })
+    .append('text')
+    .text(function(d){return d;})
+    .attr({
+      "text-anchor": "middle",
+      "font-family": "sans-serif",
+      "font-size": 14,
+      x: 0,
+      y: -(r1 + markers.hour.primary.height + 8),
+      dy: 5,
+      fill: labels.primary.color,
+      transform: function(d){
+        var deg = -labelScale(d),
+            x = d3.select(this).attr('x'),
+            y = d3.select(this).attr('y');
+
+        return 'rotate('+ deg +' ' + x +' '+ y + ')';
+      }
+    });
+
+
+  g2.selectAll('.hour-marker').data(d3.range(0,12))
+    .enter().append('rect')
+    .attr({
+      x: -markers.hour.secondary.width/2,
+      y: - r2 - markers.hour.secondary.height ,
+      width: markers.hour.secondary.width,
+      height: markers.hour.secondary.height,
+      fill: markers.hour.secondary.color,
+      transform: function(d){
+        return 'rotate('+ hourMarkerScale(d) +')';
+      },
+      'class': 'hour-marker',
+    });
+
+  g2.selectAll('.min-marker').data(d3.range(0,60))
+    .enter().append('rect')
+    .attr({
+      x: -1*markers.minute.secondary.width/2,
+      y: - r2 - (markers.hour.secondary.height),
+      width: markers.minute.secondary.width,
+      height: markers.minute.secondary.height,
+      fill: markers.minute.secondary.color,
+      transform: function(d){
+        return 'rotate('+ minuteMarkerScale(d) +')';
+      },
+      'class': 'min-marker',
+    });
+
+  g2.selectAll('.minute-label').data(d3.range(5,65,5))
+    .enter()
+    .append('g')
+    .attr({
+      'class': 'minute-label',
+      'transform': function(d){
+        return 'rotate('+ labelScale(d) +')';
+      }
+    })
+    .append('text')
+    .text(function(d){return d;})
+    .attr({
+      "text-anchor": "middle",
+      "font-family": "sans-serif",
+      "font-size": 10,
+      x: 0,
+      y: -(r2 + markers.hour.secondary.height + 7),
+      dy: 4,
+      fill: labels.secondary.color,
+      transform: function(d){
+        var deg = -labelScale(d),
+            x = d3.select(this).attr('x'),
+            y = d3.select(this).attr('y');
+
+        return 'rotate('+ deg +' ' + x +' '+ y + ')';
+      }
+    });
+
+
+  g2.append('circle').attr({
+    fill: "none",
+    cx: 0,
+    cy: 0,
+    r: r2 +  (markers.hour.secondary.height),
+    stroke: markers.minute.secondary.color,
+    "stroke-width": 1
+  });
+
+
+
+  g3.append('circle').attr({
+    fill: "none",
+    cx: 0,
+    cy: 0,
+    r: r3,
+    stroke: markers.second.primary.color,
+    "stroke-width": 1
+  });
+
+
+  // BUTTONS
+
+
+  // Button Symbols
+  var buttons = d3.map([
+    {type: "triangle-up", size: r4*0.8, id: 'play' },
+    {type: "square", size: r4*0.9, id:'stop' }
+  ], function(d){
+    return d.id;
+  });
+
+  // Change Button Symbol
+  function updateButton(state){
+    return g4.select('.button')
+      .transition()
+      .ease("linear")
+      .attr({
+        d: d3.svg.symbol()
+        .size(function(){
+          return buttons.get(state)
+            .size*buttons.get(state).size;})
+        .type(function(){
+          return buttons.get(state).type;}),
+        transform: 'rotate(90)'
+      });
+  }
+
+  // Draw Button
+  g4.append("path")
+    .attr({
+      d: d3.svg.symbol()
+        .size(function(){
+          return buttons.get('play')
+            .size*buttons.get('play').size;
+        })
+        .type(function(){
+          return buttons.get('play').type;
+        }),
+      fill: "#E91E63",
+      transform: 'rotate(90)',
+      'class': 'button',
+      'style': 'cursor: pointer'
+    }).on('click', function(){
+       toggleTimer();
+      g4.select('.reset-timeout').remove();
+    })
+    .on('mouseover', function(){
+      if(!elapsedTime) return;
+
+      g4.append("path")
+      .datum({endAngle: 2*Math.PI})
+      .attr({
+        d: arc,
+        fill: "#E91E63",
+        class: 'reset-timeout'
+      })
+      .transition()
+      .duration(2000)
+      .call(arcTween, 0)
+      .each('end',function(){
+        resetTimer();
+        this.remove();
+      });
+
+    })
+    .on('mouseout', function(){
+      g4.select('.reset-timeout').transition().duration(0).remove();
+    });
+
+  var arc = d3.svg.arc()
+      .innerRadius(r4-5)
+      .outerRadius(r4)
+      .startAngle(2*Math.PI);
+
+  function arcTween(transition, newAngle){
+     transition.attrTween("d", function(d) {
+      var interpolate = d3.interpolate(d.endAngle, newAngle);
+      return function(t) {
+        d.endAngle = interpolate(t);
+        return arc(d);
+      };
+    });
+  }
+
+  // Timer variables
+  var timeoutHandle, now, startTime, isStarted = false, elapsedTime = 0;
+
+  // Toggle timer state
+  function toggleTimer(){
+    isStarted = !isStarted;
+    g4.select('.reset-timeout').transition();
+    if(isStarted){
+      updateButton('stop');
+      startTime = Date.now();
+      tick();
+    }
+    else {
+      clearTimeout(timeoutHandle);
+      updateButton('play');
+    }
+  }
+  function tick(){
+    now = Date.now();
+    elapsedTime = elapsedTime + now - startTime;
+    startTime = now;
+
+    var ms = elapsedTime/10,
+        seconds = ms/100,
+        minutes = seconds/60;
+
+    updateNeedle(g1.needle, minuteMarkerScale(seconds));
+    updateNeedle(g2.needle, minuteMarkerScale(minutes));
+    updateNeedle(g3.needle, miliSecondScale(ms));
+    timeoutHandle = setTimeout(tick,0);
+  }
+
+  function resetTimer(){
+    clearTimeout(timeoutHandle);
+    isStarted = false;
+    updateButton('play');
+    elapsedTime = now = startTime = 0;
+    updateNeedle(g1.needle, minuteMarkerScale(0), 500);
+    updateNeedle(g2.needle, minuteMarkerScale(0), 500);
+    updateNeedle(g3.needle, miliSecondScale(0), 500);
+  }
+
+
+  // Clock Needle/Hand
+
+  //data for needle shape
+  function needleData(data){
+    var wa = data.width,
+        wb = data.width*3,
+        lb = data.wheelRadius + 5,
+        la = data.length - lb;
+
+    return [
+          [wb/2, lb],
+          [wb/2, -lb],
+          [wa/2,-lb],
+          [wa/2,-la-lb],
+          [-wa/2,-la-lb],
+          [-wa/2,-lb],
+          [-wb/2,-lb],
+          [-wb/2,lb]
+        ];
+  }
+
+  //draw needle
+  function drawNeedle(g, data){
+
+    g.needle = g.append('g');
+    // Needle Shape
+    g.needle.append('path')
+      .attr({
+        d: lineFun(needleData(data)),
+        class: 'needle',
+        fill: data.color,
+        "stroke-width": 0
+      });
+
+    // Needle Wheel
+    g.needle.append('circle')
+      .attr({
+        r: data.wheelRadius,
+        fill: "#fff",
+        stroke: data.color,
+        "stroke-width": data.wheelStroke
+      });
+  }
+
+  // update needle angle
+  function updateNeedle(needle, angle, transition){
+    transition = transition || 0;
+    needle
+      .transition()
+      .duration(transition)
+      .ease('quad-out')
+      .attr({
+        transform: "rotate("+ angle +")"
+      });
+  }
+
+
+  drawNeedle(g1, needles.primary);
+  drawNeedle(g2, needles.secondary);
+  drawNeedle(g3, needles.tertiary);
+
+    </script>
+  </body>
+</html>
