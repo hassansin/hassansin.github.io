@@ -142,7 +142,7 @@ From Documentation:
 
 > On replica sets, the TTL background thread only deletes documents on the primary. However, the TTL background thread does run on secondaries. Secondary members replicate deletion operations from the primary.
 
-Here is primary and secondary server status output hosted at MLab. Output shows that TTLMonitor thread runs at both servers but documents are deleted only at primary.
+Here is primary and secondary server status output hosted at MLab. Output shows that TTLMonitor thread runs at both servers but documents are deleted by TTL thread only at primary server.
 
 **Primary**
 
