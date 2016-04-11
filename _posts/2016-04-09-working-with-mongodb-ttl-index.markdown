@@ -13,7 +13,7 @@ MongoDB 2.2 or higher supports TTL (Time-To-Live) indexes. `TTL Monitor` is a se
 
 Application of TTL indexes can be in Shopping Carts, Login sessions, Event logs etc where the data needs to be retained only for a certain period of time.
 
-This post shows various aspects of TTL indexes collected from my experience on working with TTL indexes, MongoDB documentation, Source code at GitHub, MongoDB Jira issues.
+This post shows various aspects of TTL indexes collected from my experience on working with TTL indexes, MongoDB documentation, Source code at GitHub, MongoDB Jira issues. All commands are tested under MongoDB `v3.2.4`.
 
 ## TTLMonitor Sleep Interval
 
@@ -151,3 +151,12 @@ Here is primary and secondary server status output hosted at MLab. Output shows 
 **Secondary**
 
 <div data-gist-show-spinner="true" data-gist-file="commands.js" data-gist-id="bcb7cdfdcdb74f7c2427b7a0a23686b6" data-gist-line="163-172" data-gist-hide-footer="true"></div>
+
+## Find TTL indexes
+
+`db.getIndexes()` doesn't have any option to find only TTL indexes. Following snippet will find all TTL indexes in the entire database.
+
+<div data-gist-show-spinner="true" data-gist-file="commands.js" data-gist-id="bcb7cdfdcdb74f7c2427b7a0a23686b6" data-gist-line="177-182" data-gist-hide-footer="true"></div>
+
+
+<div data-gist-show-spinner="true" data-gist-file="commands.js" data-gist-id="bcb7cdfdcdb74f7c2427b7a0a23686b6" data-gist-line="184-194" data-gist-hide-footer="true"></div>
