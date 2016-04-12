@@ -245,6 +245,10 @@ article {
   max-width: 700px;
   margin: 0 auto;
   padding-bottom: 50px;
+  font-size: 18px;
+  line-height: 30px;
+  word-wrap: break-word;
+
   .title {
     line-height: 1.4em;
     text-align: center;
@@ -266,11 +270,7 @@ article {
     border-bottom: 1px solid #000;
     margin: 30px 0;
   }
-  p {
-    font-size: 18px;
-    line-height: 30px;
-    word-wrap: break-word;
-  }
+
   .footnote {
     border: 0;
   }
@@ -388,6 +388,14 @@ section {
           }
         }
       }
+    }
+  }
+}
+#markdown-toc{
+  a {
+    border: none;
+    &:hover, &:focus {
+      border-bottom: 1px solid #4078c0;
     }
   }
 }

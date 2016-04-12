@@ -15,6 +15,9 @@ Application of TTL indexes can be in Shopping Carts, Login sessions, Event logs 
 
 This post shows various aspects of TTL indexes collected from my experience on working with TTL indexes, MongoDB documentation, Source code at GitHub, MongoDB Jira issues. All commands are tested under MongoDB `v3.2.4`.
 
+* TOC
+{:toc}
+
 ## TTLMonitor Sleep Interval
 
 By Default, the TTLMonitor thread runs once in every 60 seconds. You can find out the sleep interval using following admin command.
@@ -120,6 +123,7 @@ Here is the log that shows us the reason:
 Here is the output of the commands:
 
 <div data-gist-show-spinner="true" data-gist-file="commands.js" data-gist-id="bcb7cdfdcdb74f7c2427b7a0a23686b6" data-gist-line="107-127" data-gist-hide-footer="true"></div>
+
 
 - To update an existing TTL index with a bad value of `expireAfterSeconds`, e.g. a string value instead of integer, you can't use `collMod` command to fix it. Instead, the index should be deleted first and create another TTL index with proper integer value.
 
