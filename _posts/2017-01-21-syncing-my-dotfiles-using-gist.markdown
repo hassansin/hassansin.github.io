@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Syncing my dotfiles across my home and office pcs using gist"
+title:  "Syncing my dotfiles between my home and office pcs using gist"
 date:   2017-01-21 20:00:00 +0000
 categories: gist dotfiles
 tags: gist dotfiles
