@@ -22,9 +22,8 @@ to sync up the file.
 
 I know there are many other dotfile syncing tools out there, but I needed something simple and manageable right from my zsh config. It Just does what I need, not another feature-rich tool, 99% of which remains unused. Maybe I'll put these two commands in aliases and save some keystrokes, but for now, I'll stick with `Ctrl+r`.
 
-Here is the bash function I used. It uses `jq` to parse the json response from api.github.como/gist. I know it's another dependent tool, but that's fine for me as I always have jq installed in my pcs. 
+Here is the bash function I used. It uses `jq` to parse the json response from [api.github.com/gist](https://developer.github.com/v3/gists/#edit-a-gist). I know it's another dependent tool, but that's fine for me as I always have jq installed in my pcs. 
 
-**~/.zshrc**
 {% highlight shell %}
 export DOTFILES_GISTID=2a2bd32c9c2e514c17da4b2ec8b3851c
 gist(){
