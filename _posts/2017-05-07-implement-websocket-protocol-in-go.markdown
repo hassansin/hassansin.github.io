@@ -2,7 +2,7 @@
 ---
 layout: post
 title:  "Implementing WebSocket Protocol in Go"
-date:   2017-05-07 12:00:00 +0000
+date:   2017-05-06 12:00:01 +0000
 categories: go
 tags: go websocket
 ---
