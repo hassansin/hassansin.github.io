@@ -65,7 +65,7 @@ func New(w http.ResponseWriter, req *http.Request) (*Ws, error) {
 
 Now to complete the handshake server must response back with appropriate headers. The handshake response looks like following
 
-{% highlight %}
+{% highlight text %}
 HTTP/1.1 101 Switching Protocols
 Upgrade: websocket
 Connection: Upgrade
@@ -113,7 +113,7 @@ func (ws *Ws) Handshake() error {
 
 After completing the handshake without any error, we are ready to read/write data from the client. Websocket spec defines a [specific frame format](https://tools.ietf.org/html/rfc6455#section-5.2) to be used between client & servers. Bit patterns of each frame is described below.
 
-{% highlight %}
+{% highlight text %}
        0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
      +-+-+-+-+-------+-+-------------+-------------------------------+
