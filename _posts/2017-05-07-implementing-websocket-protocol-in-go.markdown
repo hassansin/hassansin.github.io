@@ -8,7 +8,7 @@ tags: go websocket
 
 # Implementing WebSocket Protocol in Go
 
-The target of this post is to write a simple websocket echo server based on `net/http` library. Also understanding HTTP hijacking, binary encoding/decoding in Go. Websocket is relative simple protocol to implement. It uses HTTP protocol for initial handshaking. After the handshaking it basically uses raw TCP to read/write data. We'll be using the [Websocket Protocol Specification](https://tools.ietf.org/html/rfc6455) as a reference to the implementation.
+The target of this post is to write a simple websocket echo server based on `net/http` library. Also understanding HTTP hijacking, binary encoding/decoding in Go. Websocket is a relatively simple protocol to implement. It uses HTTP protocol for initial handshaking. After the handshaking it basically uses raw TCP to read/write data. We'll be using the [Websocket Protocol Specification](https://tools.ietf.org/html/rfc6455) as a reference to the implementation.
 
 Full source code is available [here](https://github.com/hassansin/go-websocket-echo-server)
 
@@ -28,7 +28,7 @@ Limitations of the implementations:
 
 ## Handshaking
 
-So the first thing is to setup a HTTP server using Go's `net/http` package. Then we attach a handler to listen any incoming http requests. The initial handshake request has to be started by the client, so we need interpret the client request to make sure if it's a websocket request or a normal http request. 
+The first thing is to setup a HTTP server using Go's `net/http` package. Then we attach a handler to listen to any incoming http requests. The initial handshake request has to be started by the client, so we need interpret the client request to make sure if it's a websocket request or a normal http request. 
 
 The handshake from the client looks as follows:
 
@@ -41,9 +41,11 @@ Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
 Origin: http://example.com
 {% endhighlight %}
 
+All the requirements for a valid opening handshake request is described in the spec [here](https://tools.ietf.org/html/rfc6455#section-4.1)
+
 ### Hijacking HTTP Request
 
-Once we know that it's a websocket request, the server needs to reply back with a handshake response. But we can't write back the response using the `http.ResponseWriter` as it will also close the underlying tcp connection once we start sending the response. What is need is called [HTTP Hijacking](https://golang.org/pkg/net/http/#Hijacker). Hijacking allows us to take over the underlying tcp connection handler and bufioWriter. This gives us the freedom to read and write data at will without closing the tcp connection.
+Once we know that it's a websocket request, the server needs to reply back with a handshake response. But we can't write back the response using the `http.ResponseWriter` as it will also close the underlying tcp connection once we start sending the response. What we need is called [HTTP Hijacking](https://golang.org/pkg/net/http/#Hijacker). Hijacking allows us to take over the underlying tcp connection handler and bufioWriter. This gives us the freedom to read and write data at will without closing the tcp connection.
 
 
 {% highlight go %}
@@ -70,6 +72,7 @@ Upgrade: websocket
 Connection: Upgrade
 Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
 {% endhighlight %}
+
 The value of `Sec-WebSocket-Accept` is calculated as following:
 
 > For this header field(Sec-WebSocket-Key), the server has to take the value (as present
@@ -100,7 +103,7 @@ func (ws *Ws) Handshake() error {
         "Upgrade: WebSocket",
         "Connection: Upgrade",
         "Sec-WebSocket-Accept: " + hash,
-        "", // required for extra CRLF
+        "",
         "", // required for extra CRLF 
     }
     return ws.write([]byte(strings.Join(lines, "\r\n")))
@@ -110,7 +113,7 @@ func (ws *Ws) Handshake() error {
 
 ## Data Frame Transfer
 
-After completing the handshake without any error, we are ready to read/write data from the client. Websocket spec defines a [specific frame format](https://tools.ietf.org/html/rfc6455#section-5.2) to be used between client & servers. Bit patterns of each frame is described below.
+After completing the handshake without any error, we are ready to read/write data from/to the client. Websocket spec defines a [specific frame format](https://tools.ietf.org/html/rfc6455#section-5.2) to be used between client & servers. Bit patterns of each frame is described below.
 
 {% highlight text %}
        0                   1                   2                   3
@@ -213,7 +216,7 @@ func (ws *Ws) Recv() (Frame, error) {
     a. store 127 in second byte
     b. convert the payload `length` into a 8-byte slice in network byte order
     c. append the length bytes to the header bytes
-6. Finally append the payload data
+6. Finally append the payload data without masking
 
 
 {% highlight go %}
@@ -248,7 +251,7 @@ func (ws *Ws) Send(fr Frame) error {
 
 ## Closing Handshake
 
-Closing is done by sending a close frame with close status as payload. An optional close reason can be also sent in the payload. If client initiates the closing sequence,then the server should also send a close frame in response. Finally the underlying TCP connection is closed.
+Closing is done by sending a close frame with close status as payload. An optional close reason can be also sent in the payload. If client initiates the closing sequence,then the server should also send a corresponding close frame in response. Finally the underlying TCP connection is closed.
 
 {% highlight go %}
 
