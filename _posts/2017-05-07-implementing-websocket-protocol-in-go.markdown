@@ -21,16 +21,45 @@ The implementation can divided into 4 parts:
 * Send data frames to client
 * Closing handshake
 
-Limitations of the implementations:
+Limitations of this implementation:
 
 * Doesn't validate UTF-8 encoded fragments
 * Doesn't handle compression
 
 ## Handshaking
 
-The first thing is to setup a HTTP server using Go's `net/http` package. Then we attach a handler to listen to any incoming http requests. The initial handshake request has to be started by the client, so we need interpret the client request to make sure if it's a websocket request or a normal http request. 
+At first we setup a HTTP server using Go's `net/http` package. Then we attach a handler to listen to any incoming http requests. 
 
-The handshake from the client looks as follows:
+{% highlight go %}
+
+func WsHandle(w http.ResponseWriter, r *http.Request) {
+
+	ws, err := New(w, r)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	err = ws.Handshake()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	defer ws.Close()
+    for {
+        // ...
+    }
+}
+func main() {
+	http.HandleFunc("/", WsHandle)
+	log.Fatal(http.ListenAndServe(":9001", nil))
+}
+
+{% endhighlight %}
+
+
+The initial handshake request has to be started by the client, so we need interpret the client request to make sure if it's a websocket request or a normal http request. The handshake from the client looks as follows:
 
 {% highlight go  %}
 GET /chat HTTP/1.1
@@ -269,6 +298,10 @@ func (ws *Ws) Close() error {
 }
 {% endhighlight %}
 
+
+## Testing our implementation
+
+[**Autobahn|Testsuite**](https://github.com/crossbario/autobahn-testsuite/) has comprehensive testsuites for testing the Websocket protocol with the specification. The full report for our websocket implementation is available here [https://hassansin.github.io/go-websocket-echo-server/reports/](https://hassansin.github.io/go-websocket-echo-server/reports/). 
 
 **Resources:**
 
