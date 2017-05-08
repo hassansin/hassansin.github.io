@@ -2,12 +2,12 @@
 ---
 layout: post
 title:  "Implementing WebSocket Protocol in Go"
-date:   2017-05-06 12:00:01 +0000
+date:   2017-05-07 12:00:01 +0000
 categories: go
 tags: go websocket
 ---
 
-# Implement WebSocket Protocol in Go
+# Implementing WebSocket Protocol in Go
 
 The target of this post is to write a simple websocket echo server based on `net/http` library. Also understanding HTTP hijacking, binary encoding/decoding in Go. Websocket is relative simple protocol to implement. It uses HTTP protocol for initial handshaking. After the handshaking it basically uses raw TCP to read/write data. We'll be using the [Websocket Protocol Specification](https://tools.ietf.org/html/rfc6455) as a reference to the implementation.
 
@@ -65,7 +65,7 @@ func New(w http.ResponseWriter, req *http.Request) (*Ws, error) {
 
 Now to complete the handshake server must response back with appropriate headers. The handshake response looks like following
 
-{% endhighlight %}
+{% highlight %}
 HTTP/1.1 101 Switching Protocols
 Upgrade: websocket
 Connection: Upgrade
@@ -113,7 +113,7 @@ func (ws *Ws) Handshake() error {
 
 After completing the handshake without any error, we are ready to read/write data from the client. Websocket spec defines a [specific frame format](https://tools.ietf.org/html/rfc6455#section-5.2) to be used between client & servers. Bit patterns of each frame is described below.
 
-{% endhighlight %}
+{% highlight %}
        0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
      +-+-+-+-+-------+-+-------------+-------------------------------+
