@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title:  "Implementing WebSocket Protocol in Go"
