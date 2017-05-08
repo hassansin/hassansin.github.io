@@ -301,7 +301,7 @@ func (ws *Ws) Close() error {
 
 ## Testing our implementation
 
-[Autobahn|Testsuite](https://github.com/crossbario/autobahn-testsuite/) has comprehensive testsuites for testing the Websocket protocol with the specification. The full report for our websocket implementation is available here [https://hassansin.github.io/go-websocket-echo-server/reports/](https://hassansin.github.io/go-websocket-echo-server/reports/). 
+[**AutobahnTestsuite**](https://github.com/crossbario/autobahn-testsuite/) has comprehensive testsuites for testing the Websocket protocol with the specification. The full report for our websocket implementation is available here [https://hassansin.github.io/go-websocket-echo-server/reports/](https://hassansin.github.io/go-websocket-echo-server/reports/). 
 
 **Resources:**
 
