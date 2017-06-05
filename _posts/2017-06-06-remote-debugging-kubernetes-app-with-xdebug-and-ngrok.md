@@ -20,7 +20,7 @@ ngrok tcp 9000
 
 After running the command, we'll see an status like following:
 
-{% hightlight text %}
+{% highlight text %}
 ngrok by @inconshreveable
 
 Session Status online
@@ -35,7 +35,7 @@ Connections ttl opn rt1 rt5 p50 p90
 
 You can find the public endpoint that exposes our local XDebug client running on port 9000. Now we need to copy this endpoint and put it in our php.ini and deploy the php application again:
 
-{% hightlight ini %}
+{% highlight ini %}
 xdebug.remote_host=0.tcp.ngrok.io
 xdebug.remote_port=16751
 xdebug.remote_connect_back=0
@@ -44,7 +44,7 @@ xdebug.remote_log=/var/log/xdebug.log
 
 It's better to load these values from environment variables. Before starting the server, replace the php.ini settings with corresponding environment variables. A sample docker start script would like following:
 
-{% hightlight bash %}
+{% highlight bash %}
 if [ -n "$REMOTE_HOST" ]; then sed -i "s/\(remote_host=\).*/\1$REMOTE_HOST/" /usr/local/etc/php/php.ini; fi
 if [ -n "$REMOTE_PORT" ]; then sed -i "s/\(remote_port=\).*/\1$REMOTE_PORT/" /usr/local/etc/php/php.ini; fi
 if [ -n "$REMOTE_MODE" ]; then sed -i "s/\(remote_mode=\).*/\1$REMOTE_MODE/" /usr/local/etc/php/php.ini; fi
@@ -58,7 +58,7 @@ It might also be possible to change these settings using `ini_set()` from within
 
 Now start debugging and if you have enabled remote logging, you'll see logs like following:
 
-{% hightlight text %}
+{% highlight text %}
 Log opened at 2017-06-05 04:36:13
 I: Connecting to configured address/port: 0.tcp.ngrok.io:16751.
 I: Connected to client. :-)
