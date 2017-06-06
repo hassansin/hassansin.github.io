@@ -6,11 +6,11 @@ categories: php
 tags: php xdebug kubernetes
 ---
 
-Remote debugging a php application inside a kubernetes pod could be difficult. Most often our IDE is behind a NAT router that prevents direct communication between the pod and the IDE. In these case, out best bet is to [deploy a DBGp proxy server](https://derickrethans.nl/debugging-with-multiple-users.html) that connects our IDE with the pod. But not all XDebug clients support it - there is no SublimeText package or VIM plugin that supports DBGp proxy.
+Remote debugging a php application inside a kubernetes pod could be difficult. Most often our IDE is behind a NAT router that prevents direct communication between the pod and the IDE. In this case, out best bet is to [deploy a DBGp proxy server](https://derickrethans.nl/debugging-with-multiple-users.html) that connects our IDE with the pod. But not all XDebug clients support it - there is no SublimeText package or VIM plugin that supports DBGp proxy.
 
 [Reverse port-forwarding with an SSH tunnel](https://derickrethans.nl/debugging-with-xdebug-and-firewalls.html) between the remote & local machine would be the solution in situations like this. But we cannot SSH into a kubernetes pod.
 
-Kubernetes supports port-forwarding but that only works one way i.e. it'll forward ports from local to the pod. But we need the other way around - run a server locally and listen to it in the pod. There is an [open issue](https://github.com/kubernetes/kubernetes/issues/20227) to have a support for this.  Until the feature is added we need to find another way.
+Kubernetes supports port-forwarding but that only works one way i.e. it'll forward ports from local to the pod. But we need the other way around - run a server locally and listen to it in the pod. There is an [open issue](https://github.com/kubernetes/kubernetes/issues/20227) to have a support for this.  Until they add the feature we need to find another way.
 
 [ngrok](https://ngrok.io) could expose our local network to internet by creating a secure tunnel between a public endpoint and a locally running network service. ngrok TCP tunnels allow you to expose any networked service that runs over TCP. To start a TCP tunnel:
 
@@ -53,7 +53,7 @@ if [ -n "$REMOTE_CONNECT_BACK" ]; then sed -i "s/\(remote_connect_back=\).*/\1$R
 php -c /usr/local/etc/php/ -S 0.0.0.0:80 -t public public/index.php
 {% endhighlight %}
 
-It might also be possible to change these settings using `ini_set()` from within code, but I didn't try if that works. 
+We can also change these settings using `ini_set()` from within code, but I didn't try if that works.
 
 
 Now start debugging and if you have enabled remote logging, you'll see logs like following:
