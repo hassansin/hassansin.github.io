@@ -6,7 +6,7 @@ categories: php
 tags: php xdebug kubernetes
 ---
 
-Remote debugging a php application inside a kubernetes pod could be difficult. Most often our IDE is behind a NAT router that prevents direct communication between the pod and the IDE. In this case, out best bet is to [deploy a DBGp proxy server](https://derickrethans.nl/debugging-with-multiple-users.html) that connects our IDE with the pod. But not all XDebug clients support it - there is no SublimeText package or VIM plugin that supports DBGp proxy.
+Remote debugging a php application inside a kubernetes pod could be difficult. Most often our IDE is behind a NAT router that prevents direct communication between the pod and the IDE. In this case, out best bet is to [deploy a DBGp proxy server](https://derickrethans.nl/debugging-with-multiple-users.html) on the NAT machine that connects our IDE with the pod. But not all XDebug clients support it - there is no SublimeText package or VIM plugin that supports DBGp proxy. Even worse is you don't have control to configure the NAT machine and install the proxy server.
 
 [Reverse port-forwarding with an SSH tunnel](https://derickrethans.nl/debugging-with-xdebug-and-firewalls.html) between the remote & local machine would be the solution in situations like this. But we cannot SSH into a kubernetes pod.
 
