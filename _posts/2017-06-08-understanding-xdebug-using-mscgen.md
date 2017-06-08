@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Understanding XDebug using Message Sequence Charts (mscgen)"
-date:   2017-06-06 13:01:49 +0000
+date:   2017-06-08 13:01:49 +0000
 categories: php
 tags: xdebug mscgen
 custom_js:
