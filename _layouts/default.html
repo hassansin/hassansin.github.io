@@ -6,6 +6,7 @@ layout: compress
 <html lang="en">
 
 	<head>
+        <script type="text/javascript" src="//platform-api.sharethis.com/js/sharethis.js#property=59397f08699595001138ab51&product=sticky-share-buttons"></script>
 		{% include head.html %}
 	</head>
 
@@ -43,27 +44,6 @@ layout: compress
         </a>
       </nav>
     </footer>
-    <script type="text/javascript" src="{{ site.baseurl }}/assets/share-button.min.js"></script>
-    <script type="text/javascript">
-    	new ShareButton({
-			  ui:{
-			  	button_font: false,
-			  	icon_font: false,
-			  	buttonText: '<i class="fa fa-share-alt fa-lg"></i> Share',
-			  },
-			  networks:{
-		  		pinterest: {
-		  			enabled: false,
-		  		},
-		  		reddit: {
-		  			enabled: false,
-		  		},
-		  		whatsapp: {
-		  			enabled: false,
-		  		},
-		  	}
-			});
-    </script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		{% if page.custom_js %}
 		  {% for js_file in page.custom_js %}
