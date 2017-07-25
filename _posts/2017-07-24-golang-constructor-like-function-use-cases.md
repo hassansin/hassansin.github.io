@@ -8,7 +8,7 @@ tags: go
 
 Go doesn’t have any OOP like constructors but it suggests to use constructor-like functions for initializing types. In this post I’ll list some use cases of constructor functions. These are just some idiomatic uses of the constructor, not any language bound constraints. All the examples are taken from the Go built-in libraries.
 
-## Initialize types with with non-zero default values
+## Initialize types with non-zero default values
 
 Declaring variables, or calling of `new`, or using composite literal without any explicit value, or calling of `make` - in all these cases we get a zero valued variable. But sometimes we want the variables to be initialized with some sensible non-zero values. This is the most common use case of constructors. We can find this type of usage in almost all the built-in packages. For example in `encoding/json` package:
 
