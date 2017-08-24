@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>Child Window</title>
+        <script>
+            function longrunning(){
+                for(let i=0;i<2000000000;i++);
+            }
+            window.addEventListener('DOMContentLoaded', e => window.opener.childLogger(`popup initial html loaded, popup window url: ${window.location.href}`))
+            window.opener.childLogger('starting long synchronous process inside popup window. This will prevent the event loop in top window')
+            longrunning()
+            window.opener.childLogger('finished long synchronous process inside popup window.')
+            // window.close()
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

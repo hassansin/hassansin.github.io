@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>Top Window</title>
+        <script>
+            function longrunning(){
+                for(let i=0;i<2000000000;i++);
+            }
+            let t0
+            let t1
+            const elapsedTime = () => {
+                if(!t0) {
+                    t0 = performance.now()
+                    t1 = t0
+                } else {
+                    t1 = performance.now()
+                }
+                return ((t1-t0)/1000).toFixed(2)
+            }
+            window.parentLogger = (str) => {
+                console.log("[%s] TOP: %s", elapsedTime(), str)
+            }
+            window.childLogger = (str) => {
+                console.log("[%s] CHILD: %s", elapsedTime(), str)
+            }
+
+            parentLogger('before opening popup')
+            const popup = window.open('child.html');
+            // var popup = window.open('/child.html', '', 'noopener=true');
+            if(popup) {
+                parentLogger(`after popup opened, popup window url: ${popup.location.href}`)
+            }
+
+            parentLogger('starting long synchronous process. This will prevent loading and parsing of popup window')
+            longrunning();
+            parentLogger('finished long synchronous process.')
+
+            parentLogger('adding 1s timeout.')
+            setTimeout(function(){
+                parentLogger('timed out')
+            },1000)
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
