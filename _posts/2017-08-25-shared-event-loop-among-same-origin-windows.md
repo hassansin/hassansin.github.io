@@ -6,7 +6,7 @@ categories: javascript
 tags: javascript
 ---
 
-I recently came across an article that says, <mark>All windows on the same origin share an event loop as they can synchronously communicate</mark>. This got me thinking — so if I've multiple tabs (since tabs are basically same as windows in modern browsers) of different pages from the same host, they all will be rendered in a single-thread. But this doesn't make sense, since Chrome runs each tab in its own process. There's no way they could share the same event-loop. Time to dig in.
+I recently came across an article that says, <mark>All windows on the same origin share an event loop as they can synchronously communicate</mark>. This got me thinking — so if I've multiple tabs (since tabs are basically same as windows in modern browsers) of different pages from the same host, they all will be rendered in a single thread. But this doesn't make sense, since Chrome runs each tab in its own process. There's no way they could share the same event-loop. Time to dig in.
 
 
 ## Chrome's Process Model
@@ -58,7 +58,7 @@ You can see the total elapsed time in seconds in square brackets for each event.
 
 1. Opening the popup window is synchronous but the content in the popup is loaded asynchronously. That's why when we inspect the popup url right after `window.open`, it is set to `about:blank`. The actual fetching of the URL is deferred and starts after the current script block finishes executing. 
 
-2. Next we run a long running task in the top window. This will delay the content loading in the popup window
+2. Next we run a long running task in the top window. This blocks the event loop and any pending callbacks. So the content in the popup window won't be able to load until the synchronous process finishes.
 
 3. Then we add a 1 sec timeout in the top window. This finishes the current script block in the top window. That means now the popup window will get a chance to load its content.
 
@@ -69,5 +69,11 @@ You can see the total elapsed time in seconds in square brackets for each event.
 6. And finally we see the 1 sec timeout callback is fired approximately after 6 seconds later.
 
 
-So how do we run same-origin windows in it's own process without affecting each others' event-loop? It turns out we can pass an option [`noopener`](https://developer.mozilla.org/en-US/docs/Web/API/Window/open) in `window.open()`. But using the option also loses any reference to the parent/child window. So we can't communicate between the windows using `window.postMessage()`
+So it's clear from the timings of when content is loaded in popup and when the setTimeout callback is fired in top window - that they both share the same event-loop.
+
+So how do we run same-origin windows in it's own process without affecting each others' event-loop? It turns out we can pass an option [`noopener`](https://developer.mozilla.org/en-US/docs/Web/API/Window/open) in `window.open()`. But using the option also loses any reference to the parent/child window. So we can't communicate between the windows using `window.postMessage()`. 
+
+---
+
+All these behavior could be different in different browsers. It's all actually browser implementation specific. We can even pass different flags in Chrome and choose different process model.
 
