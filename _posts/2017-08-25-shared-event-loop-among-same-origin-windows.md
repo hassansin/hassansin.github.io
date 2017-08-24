@@ -59,4 +59,17 @@ The demo is available [here](/assets/chrome-process-models/top.html). You'll nee
 
 You can see the total elapsed time in seconds in square brackes for each event. `TOP` indicates it's logged from the parent window and `CHILD` indicates it is logged from the popup window. Here is a rundown of what's happening:
 
-1.
+1. Opening the popup window is synchronous but the content in the popup is loaded asynchrounously. That's why when we inspect the popup url right after `window.open` statestate, it is set to `about:blank`. The actual fetching of the URL is deferred and starts after the current script block finishes executing. 
+
+2. Next we run a long running task in the top window. This will delay the content loading in the popup window
+
+3. Then we add a 1 sec timeout in the top window. This finishes the current script block in the top window. That means now the popup window will get a chance to load its content.
+
+4. The popup window will start loading content and execute any javascript code it sees along the way. At the top on the content of the popup window, we again start a long running task. As long as it's running it'll prevent any pending callback from execution. That means our 1 sec timeout in the top window will also be delayed.
+
+5. Next we see the `DOMContentLoaded` event is fired for the popup window. This event is fired when the initial HTML document has been completely loaded and parsed, without waiting for stylesheets, images, and subframes to finish loading.
+
+6. And finally we see the 1 sec timeout callback is fired approximately after 6 seconds later.
+
+
+
