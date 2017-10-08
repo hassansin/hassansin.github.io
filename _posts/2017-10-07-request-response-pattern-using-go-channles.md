@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Request-response model over asynchronous protocol using Go channels"
+title:  "Request-response pattern over asynchronous protocol using Go channels"
 date:   2017-10-07 13:01:49 +0000
 categories: go
 tags: go
@@ -20,7 +20,7 @@ Some example would be AMQP protocol, STOMP protocol, UDP packets, Websockets etc
 ## Request-Response Pattern
 In contrast, in the [request-response](https://en.wikipedia.org/wiki/Request%E2%80%93response) communication the client sends a request and the  receiver processes the request and sends a response back to the client. Now this can be implemented in both synchronous and asynchronous way. 
 
-In synchronous way, the client that sends the request and waits until a response is returned from the receiver. For example in HTTP protocol the client uses the same connection for sending the request to the server and receiving the response from it. In languages like Node.js, the http request-response might seem like as asynchronous communication, but it's because of the v8 event-loop magic. Under the hood the request is being carried on over a synchronous channel by the OS.
+In synchronous way, the client that sends the request and waits until a response is returned from the receiver. For example in HTTP protocol the client uses the same connection for sending the request to the server and receiving the response from it. In languages like Node.js, the http request-response might seem like as asynchronous communication, but it's because of the v8 event-loop magic. Under the hood the request is being carried over synchronously over a TCP connection by the OS.
 
 On the other hand, we can implement the same pattern over an asynchronous communication channel. The client sends a message to the receiver and moves on. The receiver processes it and sends back another message to the client some time later. So two messages are involved for a single transaction. On top of that these messages can happen any time and there is no native support for one message to indicate it is related to another. It is the responsibility of the requestor to match the response message with appropriate request. More from the EIP: [Asynchronous Request-Response](http://www.enterpriseintegrationpatterns.com/patterns/conversation/RequestResponse.html)
 
@@ -80,14 +80,14 @@ type Call struct {
 }
 ```
 
-We defined another type for the websocket client. It has an `id` field to be used by the next request. And the most important one is the `pending` map. The map will have all the active calls mapped with their request id.
+We have defined another type for the websocket client. It has an `counter` field to be used as `id` by the next request. And the most important one is the `pending` map. The map will have all the active calls mapped with their request id.
 
 ```go
 type WSClient struct {
 	mutex   sync.Mutex
 	conn    *websocket.Conn
 	pending map[uint64]*Call
-	id      uint64
+	counter      uint64
 }
 ```
 
@@ -127,11 +127,11 @@ func (c *WSClient) Request(payload interface{}) (interface{}, error) {
 
 2. Also due to the constraints for Write operation in Gorilla Websocket library, we also need to lock the `websocket.WriteJSON()` method.
 
-3. We are incrementing the id counter, prepare the `Call` object for the request and store it in the `WSClient.pending` map. Then we starting writing to the websocket.
+3. We are incrementing the `counter`, prepare the `Call` object for the request and store it in the `WSClient.pending` map. Then we starting writing to the websocket.
 
 4. Next we start receiving from the channel which is a blocking operation. We also set a timeout so that we don't wait forever here.
 
-5. Lastly we either send a successful response or an error.
+5. Lastly we either return a successful response or an error.
 
 
 ### Reading for Response
@@ -172,7 +172,7 @@ func (c *WSClient) read() {
 
 ### In Action
 
-Lets test our implementation by making bunch of concurrent requests. In each request we send a random integer. We then assert if we get the same random integer from the response. Here is the test code:
+Lets test our implementation by making a bunch of concurrent requests. In each request we send a random integer. We then assert if we get the same random integer from the response. Here is the test code:
 
 ```go
 func main() {
@@ -246,4 +246,4 @@ The full source is available as a gist [gist.github.com/hassansin/81e6054ff28d5e
 
 1. client.go from the `net/rpc` package: [golang.org/src/net/rpc/client.go](https://golang.org/src/net/rpc/client.go) . Most of the concept is borrowed from this package.
 
-2. [www.enterpriseintegrationpatterns.com](http://www.enterpriseintegrationpatterns.com) to support all theoritical aspects of post.
+2. [www.enterpriseintegrationpatterns.com](http://www.enterpriseintegrationpatterns.com) to support all theoritical aspects of the post.
