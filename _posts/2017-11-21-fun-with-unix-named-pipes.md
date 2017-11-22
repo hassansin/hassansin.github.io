@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Fun with Unix Named Pipes"
-date:   2017-11-22 13:01:49 +0000
+date:   2017-11-21 13:01:49 +0000
 categories: unix
 tags: unix
 ---
