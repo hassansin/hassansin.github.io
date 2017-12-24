@@ -64,7 +64,7 @@ PROMISE(5), trigger: 1, resource: undefined, execution: 1
 promise resolved: 5
 ```
 
-So there's **ONE** promise instance created for the above async function. It's obvious since when an async function is called [it always returns a promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
+Above could be explained as : The root resource (with ID 1) triggered the creation of a new `PROMISE` type resource with ID 5 and then a promise resource with ID 5 is resolved. So there's **ONE** promise instance created for the above async function. It's obvious since when an async function is called [it always returns a promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
 
 Now let's see what happens when we just add an `await` expression in return statement in above function:
 
@@ -160,7 +160,7 @@ before:  7
   promise resolved: 7
 after:   7
 ```
-Here we can see  where these three promises come from. First one is created by `new Promise()`, second one for `Promise.resolve()` and the third one comes from the `then()` callback. Remember that the `await` expression pauses execution and waits for the operation to finish? That's what the line `Promise.resolve(...).then(...)` does. This makes sense when you are waiting inside an async function and do something else with the resolved value. But when using `return await` together, that means you're waiting TWO times for the same operation -  one within the async function and then again when this async function is called from different place of your code. 
+Here we can see  where these three promises come from. First one is created by `new Promise()`, second one for `Promise.resolve()` and the third one comes from the `then()` callback. Remember that the `await` expression pauses execution and waits for the operation to finish? That's what the line `Promise.resolve(...).then(...)` does. This makes sense when you are waiting inside an async function and do something else with the resolved value. But when using `return await` together, that means you're waiting TWO times for the same operation -  one within the async function and then again when this async function is called from different place of your code. And that's just waste of CPU cycles.
 
 
 ## References
