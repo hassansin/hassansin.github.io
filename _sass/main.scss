@@ -180,6 +180,10 @@ pre {
     padding: 0;
   }
 }
+.max-height pre{
+  max-height: 500px; /* Change to your desired max height */
+  overflow-y: scroll;
+}
 table {
   width: 100%;
   margin: 45px 0;
